@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.Serializable;
 
@@ -35,7 +36,7 @@ public class UserController implements Serializable {
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO findById(@PathVariable Long id) {
-        User user = service.findById(id);
+        User user = service.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         UserDTO userDTO = mapper.map(user, UserDTO.class);
         return userDTO;
     }

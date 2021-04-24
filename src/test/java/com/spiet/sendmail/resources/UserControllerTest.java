@@ -24,6 +24,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.Optional;
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 @WebMvcTest
@@ -72,12 +74,26 @@ public class UserControllerTest {
 
         MockHttpServletRequestBuilder req = MockMvcRequestBuilders.get(BASE_URL.concat("/"+id));
 
-        BDDMockito.given(service.findById(Mockito.anyLong())).willReturn(user);
+        BDDMockito.given(service.findById(Mockito.anyLong())).willReturn(Optional.of(user));
+
+        Optional<User> result = service.findById(id);
 
         mvc.perform(req)
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("name").value("Jon Doe"))
-                .andExpect(MockMvcResultMatchers.jsonPath("email").value("JonDoe@email.com"));
+                .andExpect(MockMvcResultMatchers.jsonPath("name").value(result.get().getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("email").value(result.get().getEmail()));
+    }
 
+    @Test
+    @DisplayName("Deve retornar 404 quando o usuario não for encontrado")
+    void return404ifUserDoenstExist() throws Exception{
+        Long id = 1L;
+
+        MockHttpServletRequestBuilder req = MockMvcRequestBuilders.get(BASE_URL.concat("/"+id));
+
+        BDDMockito.given(service.findById(Mockito.anyLong())).willReturn(Optional.empty());
+
+        mvc.perform(req)
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 }

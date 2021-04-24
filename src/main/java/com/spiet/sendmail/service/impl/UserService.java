@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 @Service
 public class UserService implements IUserService {
 
@@ -27,7 +29,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User findById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public Optional<User> findById(Long id) {
+        return repository.findById(id);
     }
 }
