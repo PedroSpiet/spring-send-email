@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spiet.sendmail.DTOs.UserDTO;
 import com.spiet.sendmail.domain.User;
 import com.spiet.sendmail.service.IUserService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -24,6 +28,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
@@ -95,5 +100,31 @@ public class UserControllerTest {
 
         mvc.perform(req)
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Deve filtrar um livro")
+    public void fitlerBook() throws Exception {
+        Long id = 1L;
+        UserDTO userDTO = UserDTO.builder().name("Jon Doe").email("JonDoe@email.com").build();
+        User user = new ModelMapper().map(userDTO, User.class);
+        user.setId(id);
+
+        BDDMockito.given(service.find(Mockito.any(UserDTO.class), Mockito.any(Pageable.class)))
+                .willReturn(new PageImpl<User>(Arrays.asList(user), PageRequest.of(0, 10), 1));
+
+        // /users
+
+        String queryString = String.format("?name=%s&email=%s&page=0&size=10", user.getName(), user.getEmail());
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get(BASE_URL.concat(queryString))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("content", Matchers.hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("totalElements").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("pageable.pageSize").value(10))
+                .andExpect(MockMvcResultMatchers.jsonPath("pageable.pageNumber").value(0));
     }
 }

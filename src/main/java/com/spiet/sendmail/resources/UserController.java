@@ -6,6 +6,8 @@ import com.spiet.sendmail.service.IUserService;
 import com.spiet.sendmail.service.impl.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -39,5 +41,11 @@ public class UserController implements Serializable {
         User user = service.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         UserDTO userDTO = mapper.map(user, UserDTO.class);
         return userDTO;
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public Page<UserDTO> findAll(UserDTO dto, Pageable pageable) {
+       return service.find(dto, pageable).map(entity ->  mapper.map(entity, UserDTO.class));
     }
 }
