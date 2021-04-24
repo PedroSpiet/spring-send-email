@@ -31,4 +31,12 @@ public class UserController implements Serializable {
        User user = service.createUser(dto);
        return mapper.map(user, UserDTO.class);
     }
+
+    @GetMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDTO findById(@PathVariable Long id) {
+        User user = service.findById(id);
+        UserDTO userDTO = mapper.map(user, UserDTO.class);
+        return userDTO;
+    }
 }

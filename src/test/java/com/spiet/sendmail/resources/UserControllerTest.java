@@ -60,4 +60,24 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("email").value("JonDoe@email.com"));
 
     }
+
+    @Test
+    @DisplayName("deve retornar um usuário por id")
+    void returnUserById() throws Exception{
+        Long id = 1L;
+
+        UserDTO userDTO = UserDTO.builder().name("Jon Doe").email("JonDoe@email.com").build();
+        User user = new ModelMapper().map(userDTO, User.class);
+        user.setId(id);
+
+        MockHttpServletRequestBuilder req = MockMvcRequestBuilders.get(BASE_URL.concat("/"+id));
+
+        BDDMockito.given(service.findById(Mockito.anyLong())).willReturn(user);
+
+        mvc.perform(req)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("name").value("Jon Doe"))
+                .andExpect(MockMvcResultMatchers.jsonPath("email").value("JonDoe@email.com"));
+
+    }
 }

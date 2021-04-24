@@ -5,4 +5,5 @@ import com.spiet.sendmail.domain.User;
 
 public interface IUserService {
     User createUser(UserDTO user);
+    User findById(Long id);
 }
