@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,15 +23,25 @@ public class UserService implements IUserService {
 
     private UserRepository repository;
     private ModelMapper mapper;
+    private EmailService emailService;
 
-    public UserService(UserRepository repository, ModelMapper mapper) {
+    public UserService(UserRepository repository, ModelMapper mapper, EmailService emailService) {
         this.repository = repository;
         this.mapper = mapper;
+        this.emailService = emailService;
     }
 
     @Override
     public User createUser(UserDTO user) {
-        return repository.save(mapper.map(user, User.class));
+        User savedUser = repository.save(mapper.map(user, User.class));
+        if (savedUser.getId() == null) {
+             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        //abaixo ficaria o email cadastrado
+        List<String> emails = Arrays.asList("testepedro-8535fc@inbox.mailtrap.io");
+        emailService.sendMail("Testando serviço de emails", emails);
+        System.out.println("Funcionou");
+        return savedUser;
     }
 
     @Override
