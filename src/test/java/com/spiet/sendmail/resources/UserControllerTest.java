@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spiet.sendmail.DTOs.UserDTO;
 import com.spiet.sendmail.domain.User;
 import com.spiet.sendmail.service.IUserService;
+import com.spiet.sendmail.service.impl.EmailService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +45,9 @@ public class UserControllerTest {
 
     @MockBean
     IUserService service;
+
+    @MockBean
+    EmailService emailService;
 
     @Test
     @DisplayName("Deve Criar um usuário")

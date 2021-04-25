@@ -26,6 +26,7 @@ public class UserController implements Serializable {
     private final IUserService service;
     private final ModelMapper mapper;
 
+    @Autowired
     public UserController(IUserService service, ModelMapper mapper) {
         this.service = service;
         this.mapper = mapper;
