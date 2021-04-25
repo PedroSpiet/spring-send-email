@@ -16,6 +16,7 @@ public class EmailService implements IEmailService {
 
     @Value("${application.mail.default-remetent}")
     private String remetente;
+
     @Autowired
     public EmailService(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
